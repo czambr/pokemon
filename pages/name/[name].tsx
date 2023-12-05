@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import { Button, Card, Grid, Text, Container, Image } from '@nextui-org/react';
-import { Pokemon } from '../../interfaces';
+import { Pokemon, PokemonListResponse } from '../../interfaces';
 import { Layout } from '../../components/layouts';
+import { pokeApi } from '../../api';
 import { getPokemonInfo, localFavorites } from '../../utils';
 
 import confetti from 'canvas-confetti';
@@ -11,7 +12,7 @@ interface Props {
     pokemon: Pokemon;
 }
 
-const PokemonPage: NextPage<Props> = ({ pokemon }) => {
+const PokemonByNamePage: NextPage<Props> = ({ pokemon }) => {
     const [isInFavorites, setIsInFavorites] = useState(localFavorites.existInFavorites(pokemon.id));
 
     const onToogleFavorite = () => {
@@ -125,18 +126,19 @@ const PokemonPage: NextPage<Props> = ({ pokemon }) => {
 // Se pregeneran las paginas segun los paths permitidos
 // en este caso, es segun el id
 export const getStaticPaths: GetStaticPaths = async ctx => {
-    const pokemon151 = [...Array(151)].map((value, index) => `${index + 1}`);
+    const pokemonName162 = await pokeApi.get<PokemonListResponse>('/pokemon?limit=151');
+    const { results } = pokemonName162.data;
     return {
         /* paths: [
             {
-                params: { id: '1' },
+                params: { name: 'bulbasaur' },
             },
             {
-                params: { id: '2' },
+                params: { name: 'venusaur' },
             },
         ], */
-        paths: pokemon151.map(id => ({
-            params: { id },
+        paths: results.map(poke => ({
+            params: { name: poke.name },
         })),
         fallback: false,
     };
@@ -146,13 +148,13 @@ export const getStaticPaths: GetStaticPaths = async ctx => {
 // Se pasan los recursos necesarios para una pagina estatica
 // en forma de props
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-    const { id } = params as { id: string };
+    const { name } = params as { name: string };
 
     return {
         props: {
-            pokemon: await getPokemonInfo(id),
+            pokemon: await getPokemonInfo(name),
         },
     };
 };
 
-export default PokemonPage;
+export default PokemonByNamePage;
