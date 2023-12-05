@@ -25,4 +25,4 @@ feedback and contributions are welcome!
 
 ## Deploy on Vercel
 
-You can see deployed project [PokemonStatic](https://pokemon-carlos-projects-07d1a694.vercel.app/)
+You can see deployed project [PokemonStatic](https://pokemon-black-one.vercel.app/)
